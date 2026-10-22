@@ -1,0 +1,84 @@
+# HALLET
+
+KKTC için hizmet pazaryeri ve usta rehberi. Saf HTML, CSS ve ES modülleri; Firebase 10.14.1 Modular SDK; Vercel üzerinde statik barındırma.
+
+## Çalıştırma
+
+Node.js 22 ve üzeriyle:
+
+```bash
+npm run dev
+```
+
+Uygulama `http://127.0.0.1:3000` adresinde açılır. `/dashboard` temiz URL'si geliştirme sunucusunda da çalışır. Ön yüz için bağımlılık kurulumu veya derleme gerekmez. Firebase SDK dosyaları CDN'den yüklenir; internet bağlantısı gerekir.
+
+Firebase yapılandırması boşken açıkça etiketlenmiş altı örnek profil gösterilir. Bu profillerin iletişim düğmeleri kapalıdır; veritabanına örnek kayıt yazılmaz. Bağlantı kurulunca yalnızca gerçek usta profilleri gösterilir.
+
+## Firebase bağlantısı
+
+1. Firebase Console'da projenize bir Web uygulaması ekleyin. `js/firebase-config.js` içindeki `firebaseConfig` alanlarını Console'un verdiği Web yapılandırmasıyla doldurun. Servis hesabı anahtarı bu dosyaya konmaz.
+2. Authentication → Sign-in method altında Email/Password ve Google sağlayıcılarını etkinleştirin. Google için destek e-postasını belirtin.
+3. Authentication → Settings → Authorized domains listesine geliştirme sunucusunun alanını, Vercel adresini ve varsa özel alanı ekleyin. Protokol veya port eklemeyin. Domain değişince bu listeyi güncelleyin; uygulamadaki bağlantılar değişmez.
+4. Cloud Firestore'un `(default)` veritabanını Firebase Web SDK ve Security Rules ile uyumlu modda oluşturun veya mevcut uyumlu veritabanını kullanın. Bölgeyi proje sahibi seçmelidir.
+5. Projenize kuralları ve indeksleri gönderin:
+
+```bash
+npm ci
+npx firebase-tools login
+npx firebase-tools deploy --only firestore --project FIREBASE_PROJECT_ID
+```
+
+`FIREBASE_PROJECT_ID` yerine Web yapılandırmanızdaki gerçek `projectId` değerini kullanın. İndekslerin oluşturulması tamamlanmadan birleşik talepler/yorumlar sorguları hata verebilir. Vercel'e dosya göndermek Firebase kurallarını yayımlamaz.
+
+İlk admin hesabı için uygulamada normal bir hesap oluşturun. Firebase Console'da bu UID'ye ait `users` belgesinin yalnızca `role` alanını `admin` yapın. Web istemcisi kendine admin rolü veremez; mevcut hesaplar istemciden rol değiştiremez. Yeni usta hesabı oluşturulurken 3 kredi verilir; giriş veya sayfa yenileme tekrar kredi eklemez.
+
+## Akışlar
+
+- Rehber: ilçe/kategori filtreleri, süresi devam eden VIP profillerin önceliği, kimlik onayı, onaylı yorumlar ve WhatsApp görüşmesi.
+- WhatsApp: mesajdaki kaynak alan adı `window.location.hostname` ile üretilir. Mesaj gönderilmez; WhatsApp görüşme ekranı açılır. `whatsappClicks` tıklama girişimlerinin sayısıdır, tekil ziyaretçi sayısı değildir. Dış bağlantı açılması görüşmenin başladığını veya mesajın gönderildiğini kanıtlamaz. İstemci sayacı bot trafiğine dayanıklı analitik olarak kullanılmamalıdır.
+- Talepler: ihtiyaç, zamanlama, bölge ve iletişim olmak üzere dört adım. Gönderim sırasında kullanıcı giriş yapmamışsa e-posta/Google girişi açılır; form bilgileri korunur. Talep oluşturmak ücretsizdir.
+- Usta paneli: yalnızca ilgili ilçe ve kategorilerdeki açık talepler; önceden açılan talepler; bakiye, WhatsApp tıklamaları ve profil düzenleme.
+- Numara açma: kullanıcı kredisi, `unlockedBy` ve işlem belgesi tek transaction içinde yazılır. Ardından özel iletişim belgesi okunur. Aynı talebi tekrar açmak kredi düşürmez. İki farklı talep tek kredi karşılığında açılamaz.
+- Admin: usta hesabına işlem başına 1–1000 kredi ekleme, VIP süresi ve kimlik onayı, talep kapatma, yorum onaylama veya onay kaldırma. Yorum moderasyonu puan ortalaması ve yorum sayısını transaction ile günceller. Kredi satışı için ödeme altyapısı eklenmemiştir; yüklemeyi admin yapar.
+- Yorumlar: giriş yapan hesap, kendisi dışındaki bir ustaya tek yorum bırakabilir. Yorumlar yönetim onayına kadar herkese açık değildir.
+- TR, EN, RU: bütün arayüz metinleri `js/i18n.js` sözlüğünden gelir; tercih tarayıcıda saklanır. Ustaların yazdığı tanıtım metinleri ve müşteri açıklamaları özgün dilinde kalır.
+
+## Veri modeli ve telefon gizliliği
+
+İstenen üç ana koleksiyon korunur: `users`, `job_requests`, `reviews`. Firestore bir belgenin bazı alanlarını okuyucuya açıp diğerlerini gizleyemez. Kredi kilidini uygulamak için şu uyarlama yapılmıştır:
+
+| Yol | İçerik | Erişim |
+| --- | --- | --- |
+| `users/{uid}` | İstenen kullanıcı şeması | Sahibi ve admin; `role=pro` profilleri telefonlarıyla birlikte açık rehberde yayımlanır |
+| `job_requests/{jobId}` | İstenen talep şeması; `customerPhone` maskeli, `details.description` iş açıklaması | İlgili açık talebe uygun ustalar, erişimi satın almış hesaplar ve admin |
+| `job_requests/{jobId}/private/contact` | `customerPhone`: gerçek `90533…`/`90548…` numarası; `customerUid`: talebi oluşturan hesap | Talebin sahibi, erişimi satın almış hesaplar ve admin |
+| `users/{uid}/private/unlock` | Son satın alınan `jobId` ve `createdAt` | Sahibi ve admin; yazma yalnızca ilgili atomik kredi işlemiyle |
+| `reviews/{customerUid}_{proId}` | İstenen yorum şeması | Onaylı yorumlar herkese; onaysız yorum sahibi ve admin |
+
+Gerçek müşteri numarası talep listesine indirilmez. Talep ve iletişim belgesi tek batch ile oluşturulur. Hesap türü, kredi, VIP, onay, puan ve tarih alanları genel profil düzenlemesiyle değiştirilemez. `unlockedBy` yalnızca kuralların doğruladığı satın alma işlemiyle genişletilir.
+
+Ustaya verilen numara daha sonra geri alınamaz. Kullanıcılar iş açıklamasına telefon veya açık adres eklememelidir. Usta rehberine kayıt, profil ve telefonun herkese açık olarak yayımlanmasını içerir; form ve veri kullanımı penceresi bunu belirtir.
+
+Bu Security Rules sürümü; rol yükseltmeyi, yetkisiz telefon erişimini ve atomik işlem dışındaki kredi değişikliklerini engellemek amacıyla hazırlanmış, emülatörde sınanmış bir prototiptir. Geniş kullanıma açmadan önce kendi proje ayarlarınız ve gerçek erişim senaryolarınızla ayrıca inceleyip doğrulayın.
+
+## Vercel
+
+Depoyu Vercel'e içe aktarın. `vercel.json`, projeyi derlemesiz statik site olarak tanımlar; `/` ve `/dashboard` adreslerini destekler. Test araçlarının üretim için kurulmasına gerek yoktur. `.vercelignore` test dosyalarını ve Firebase dağıtım dosyalarını web çıktısının dışında bırakır.
+
+Uygulamanın kendi alan adı kodda sabit değildir. Sayfa bağlantıları kökten göreli, WhatsApp referansı mevcut alan adından türetilmiştir. Firebase ve WhatsApp gibi dış servislerin SDK/servis adresleri bu kuraldan bağımsızdır. Alan değişikliğinde Firebase Authorized domains ayarı yine güncellenmelidir.
+
+## Kontroller
+
+Test bağımlılıkları için `npm ci`, Firestore emülatörü için Java 21 gerekir. Tarayıcı testleri Chromium kullanır. Farklı bir kurulumda `CHROMIUM_PATH` ortam değişkenini Chromium çalıştırılabilir dosyasına ayarlayın.
+
+```bash
+npm run check
+npm run test:rules
+npm run test:browser
+```
+
+- Statik kontroller: JavaScript/JSON sözdizimi, üç dilde anahtar ve değişken eşleşmeleri, telefon dönüşümü ve tasarım kısıtlamaları.
+- 16 Firestore testi: anonim/özel erişim, doğru sorgular, başlangıç kredisi, rol ve şema koruması, tek taraflı veya çoklu numara açma girişimleri, eşzamanlı kredi kullanımı, iletişim belgesi, admin işlemleri, yorum onayı ve sayaç alanı sınırları.
+- Tarayıcı: 320, 390, 768 ve 1440 pikselde taşma kontrolü; filtreler; kalıcı dil tercihi; dört adımlı form; e-posta kaydı; müşteri talebi; krediyle gerçek numara açma; WhatsApp bağlantısının dinamik kaynağı; sayaç; admin kredi/VIP/onay işlemleri; yorum moderasyonu.
+
+Testler `demo-hallet` adlı yerel emülatör projesi kullanır. Tarayıcı testinde demo bağlantısı yalnızca test isteğine eklenir; üretim yapılandırması değiştirilmez. Google düğmesi Modular SDK ile bağlıdır; gerçek Google OAuth ve canlı Firebase/Vercel ayarları yerel emülatör testinin kapsamında değildir.
