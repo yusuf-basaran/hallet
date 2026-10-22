@@ -1,0 +1,221 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users: özel hesap alanları; rehbere katılan ustaların profili ve telefonu yayımlanır.
+    // job_requests: şemadaki customerPhone maskelidir; gerçek numara private/contact belgesindedir.
+    // private/contact: customerUid ve customerPhone; sahip, erişim alan usta ve admin okuyabilir.
+    // users/{uid}/private/unlock: jobId ve createdAt; son kredi işleminin atomik eşleştirmesi.
+    // reviews: proId, customerName, rating, comment, isApproved ve createdAt.
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function admin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function validCity(city) {
+      return city in ['Lefkoşa', 'Gazimağusa', 'Girne', 'İskele', 'Güzelyurt', 'Lefke'];
+    }
+
+    function validCategory(category) {
+      return category in ['ac-repair', 'plumbing-electric', 'cleaning', 'moving', 'locksmith-tow'];
+    }
+
+    function text(value, minimum, maximum) {
+      return value is string && value.size() >= minimum && value.size() <= maximum;
+    }
+
+    function phone(value) {
+      return value is string && value.matches('^90(533|548)8[0-9]{6}$');
+    }
+
+    function validUser(data) {
+      return data.keys().hasAll([
+          'fullName', 'phone', 'role', 'city', 'categories', 'bio', 'credits',
+          'isVerified', 'isFeatured', 'featuredUntil', 'ratingAvg', 'reviewCount',
+          'whatsappClicks', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'fullName', 'phone', 'role', 'city', 'categories', 'bio', 'credits',
+          'isVerified', 'isFeatured', 'featuredUntil', 'ratingAvg', 'reviewCount',
+          'whatsappClicks', 'createdAt'
+        ])
+        && text(data.fullName, 2, 80)
+        && data.role in ['customer', 'pro', 'admin']
+        && (phone(data.phone) || (data.role != 'pro' && data.phone == ''))
+        && (validCity(data.city) || (data.role != 'pro' && data.city == ''))
+        && data.categories is list && data.categories.size() <= 5
+        && data.categories.hasOnly(['ac-repair', 'plumbing-electric', 'cleaning', 'moving', 'locksmith-tow'])
+        && data.categories.size() == data.categories.toSet().size()
+        && (data.role != 'pro' || data.categories.size() > 0)
+        && text(data.bio, 0, 1000)
+        && data.credits is int && data.credits >= 0 && data.credits <= 1000000
+        && data.isVerified is bool && data.isFeatured is bool
+        && (data.featuredUntil == null || data.featuredUntil is timestamp)
+        && (!data.isFeatured || data.featuredUntil is timestamp)
+        && data.ratingAvg is number && data.ratingAvg >= 0 && data.ratingAvg <= 5
+        && data.reviewCount is int && data.reviewCount >= 0 && data.reviewCount <= 1000000
+        && data.whatsappClicks is int && data.whatsappClicks >= 0 && data.whatsappClicks <= 2147483647
+        && data.createdAt is timestamp;
+    }
+
+    function validJob(data) {
+      return data.keys().hasAll([
+          'customerName', 'customerPhone', 'category', 'city', 'district', 'details',
+          'urgency', 'status', 'unlockedBy', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'customerName', 'customerPhone', 'category', 'city', 'district', 'details',
+          'urgency', 'status', 'unlockedBy', 'createdAt'
+        ])
+        && text(data.customerName, 2, 80)
+        && data.customerPhone is string
+        && data.customerPhone.matches('^0(533|548) 8[*][*] [*][*] [0-9]{2}$')
+        && validCategory(data.category) && validCity(data.city)
+        && text(data.district, 2, 80)
+        && data.details is map && data.details.keys().hasAll(['description'])
+        && data.details.keys().hasOnly(['description'])
+        && text(data.details.description, 20, 2000)
+        && data.urgency in ['acil', 'bu_hafta', 'esnek']
+        && data.status in ['open', 'closed']
+        && data.unlockedBy is list && data.unlockedBy.size() <= 1000
+        && data.unlockedBy.size() == data.unlockedBy.toSet().size()
+        && data.createdAt is timestamp;
+    }
+
+    function matchingPro(data) {
+      let account = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      return signedIn() && account.role == 'pro'
+        && account.city == data.city && data.category in account.categories;
+    }
+
+    function validPurchase(uid, jobId) {
+      let account = get(/databases/$(database)/documents/users/$(uid)).data;
+      let accountAfter = getAfter(/databases/$(database)/documents/users/$(uid)).data;
+      let job = get(/databases/$(database)/documents/job_requests/$(jobId)).data;
+      let jobAfter = getAfter(/databases/$(database)/documents/job_requests/$(jobId)).data;
+      let receipt = getAfter(/databases/$(database)/documents/users/$(uid)/private/unlock).data;
+      return owner(uid) && account.role == 'pro' && account.credits >= 1
+        && accountAfter.credits == account.credits - 1
+        && accountAfter.diff(account).affectedKeys().hasOnly(['credits'])
+        && job.status == 'open' && account.city == job.city && job.category in account.categories
+        && !(uid in job.unlockedBy)
+        && jobAfter.unlockedBy == job.unlockedBy.concat([uid])
+        && jobAfter.diff(job).affectedKeys().hasOnly(['unlockedBy'])
+        && receipt.jobId == jobId && receipt.createdAt == request.time;
+    }
+
+    match /users/{uid} {
+      allow read: if resource.data.role == 'pro' || owner(uid) || admin();
+
+      allow create: if owner(uid) && validUser(request.resource.data)
+        && request.resource.data.role in ['customer', 'pro']
+        && request.resource.data.credits == (request.resource.data.role == 'pro' ? 3 : 0)
+        && request.resource.data.isVerified == false && request.resource.data.isFeatured == false
+        && request.resource.data.featuredUntil == null
+        && request.resource.data.ratingAvg == 0 && request.resource.data.reviewCount == 0
+        && request.resource.data.whatsappClicks == 0 && request.resource.data.createdAt == request.time;
+
+      allow update: if validUser(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.role == resource.data.role
+        && (
+          (resource.data.role == 'pro'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['whatsappClicks'])
+            && request.resource.data.whatsappClicks == resource.data.whatsappClicks + 1)
+          || (owner(uid)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fullName', 'phone', 'city', 'categories', 'bio']))
+          || (owner(uid)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits'])
+            && validPurchase(uid, getAfter(/databases/$(database)/documents/users/$(uid)/private/unlock).data.jobId))
+          || (admin()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'credits', 'isVerified', 'isFeatured', 'featuredUntil', 'ratingAvg', 'reviewCount'
+            ])
+            && request.resource.data.credits >= resource.data.credits
+            && request.resource.data.credits <= resource.data.credits + 1000)
+        );
+
+      match /private/{documentId} {
+        function validReceipt(data) {
+          return data.keys().hasAll(['jobId', 'createdAt'])
+            && data.keys().hasOnly(['jobId', 'createdAt'])
+            && text(data.jobId, 20, 20) && data.jobId.matches('^[a-zA-Z0-9]{20}$')
+            && data.createdAt is timestamp && data.createdAt == request.time;
+        }
+        allow read: if documentId == 'unlock' && (owner(uid) || admin());
+        allow create, update: if documentId == 'unlock' && owner(uid)
+          && validReceipt(request.resource.data)
+          && validPurchase(uid, request.resource.data.jobId);
+      }
+    }
+
+    match /job_requests/{jobId} {
+      allow read: if signedIn() && (
+        admin() || request.auth.uid in resource.data.unlockedBy
+        || (resource.data.status == 'open' && matchingPro(resource.data))
+      );
+
+      allow create: if signedIn() && validJob(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.status == 'open' && request.resource.data.unlockedBy == []
+        && getAfter(/databases/$(database)/documents/job_requests/$(jobId)/private/contact).data.customerUid == request.auth.uid;
+
+      allow update: if signedIn() && validJob(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unlockedBy'])
+            && validPurchase(request.auth.uid, jobId))
+          || (admin() && resource.data.status == 'open' && request.resource.data.status == 'closed'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+        );
+
+      match /private/{documentId} {
+        function validContact(data) {
+          return data.keys().hasAll(['customerPhone', 'customerUid'])
+            && data.keys().hasOnly(['customerPhone', 'customerUid'])
+            && phone(data.customerPhone) && text(data.customerUid, 1, 128);
+        }
+        allow read: if documentId == 'contact' && signedIn()
+          && exists(/databases/$(database)/documents/job_requests/$(jobId))
+          && (resource.data.customerUid == request.auth.uid || admin()
+            || request.auth.uid in get(/databases/$(database)/documents/job_requests/$(jobId)).data.unlockedBy);
+        allow create: if documentId == 'contact' && signedIn() && validContact(request.resource.data)
+          && request.resource.data.customerUid == request.auth.uid
+          && !exists(/databases/$(database)/documents/job_requests/$(jobId))
+          && getAfter(/databases/$(database)/documents/job_requests/$(jobId)).data.createdAt == request.time;
+      }
+    }
+
+    match /reviews/{reviewId} {
+      function validReview(data) {
+        return data.keys().hasAll(['proId', 'customerName', 'rating', 'comment', 'isApproved', 'createdAt'])
+          && data.keys().hasOnly(['proId', 'customerName', 'rating', 'comment', 'isApproved', 'createdAt'])
+          && text(data.proId, 1, 128) && text(data.customerName, 2, 80)
+          && data.rating is int && data.rating >= 1 && data.rating <= 5
+          && text(data.comment, 20, 1000) && data.isApproved is bool && data.createdAt is timestamp;
+      }
+      allow read: if resource.data.isApproved == true || admin()
+        || (signedIn() && reviewId == request.auth.uid + '_' + resource.data.proId);
+      allow create: if signedIn() && validReview(request.resource.data)
+        && reviewId == request.auth.uid + '_' + request.resource.data.proId
+        && request.auth.uid != request.resource.data.proId
+        && get(/databases/$(database)/documents/users/$(request.resource.data.proId)).data.role == 'pro'
+        && request.resource.data.customerName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.fullName
+        && request.resource.data.isApproved == false && request.resource.data.createdAt == request.time;
+      allow update: if admin() && validReview(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isApproved']);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

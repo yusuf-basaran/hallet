@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142B3B">
+  <title data-i18n="dashboard.title">HALLET — KKTC Hizmet ve Usta Pazaryeri</title>
+  <meta name="description" content="HALLET usta ve admin paneli." data-i18n-content="brand.description">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/dashboard.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="a11y.skip">İçeriğe geç</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/" aria-label="HALLET">
+        <svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v24M26 4v24M6 16l7 7L26 10"/></svg>
+        <span>HALLET</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Ana menü" data-i18n-aria-label="a11y.navigation">
+        <a href="/#ustalar" data-i18n="nav.pros">Usta bul</a>
+        <a href="/#nasil-calisir" data-i18n="nav.how">Nasıl çalışır?</a>
+        <a href="/dashboard" data-i18n="nav.dashboard">Usta Paneli</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch" role="group" data-i18n-aria-label="nav.language" aria-label="Dil seçimi">
+          <button type="button" data-language="tr" aria-pressed="true">TR</button>
+          <button type="button" data-language="en" aria-pressed="false">EN</button>
+          <button type="button" data-language="ru" aria-pressed="false">RU</button>
+        </div>
+        <button class="btn btn-ghost btn-sm header-login" type="button" data-open-auth="login" data-guest-only data-i18n="nav.login">Giriş yap</button>
+        <button class="btn btn-ghost btn-sm header-login" type="button" data-logout data-user-only hidden data-i18n="nav.logout">Çıkış yap</button>
+        <button class="btn btn-ghost btn-icon menu-toggle" type="button" data-menu-toggle aria-controls="site-nav" aria-expanded="false" data-i18n-aria-label="nav.menu" aria-label="Menüyü aç veya kapat"><span data-icon="menu"></span></button>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="section" tabindex="-1"><div class="container">
+    <div class="page-heading"><div><p class="eyebrow" data-i18n="nav.dashboard">Usta Paneli</p><h1 id="dashboard-greeting" data-i18n="dashboard.heading">İşleriniz ve hesabınız</h1></div><a class="btn btn-secondary" href="/" data-i18n="nav.home">Anasayfa</a></div>
+    <div id="dashboard-message" class="message" hidden></div>
+    <div id="dashboard-guest" class="empty-state"><span data-icon="user"></span><h2 data-i18n="auth.needLogin">Paneli kullanmak için giriş yapın.</h2><div class="row"><button class="btn btn-primary" type="button" data-open-auth="login" data-i18n="nav.login">Giriş yap</button><button class="btn btn-secondary" type="button" data-open-auth="register" data-role="pro" data-i18n="nav.registerPro">Usta olarak katıl</button></div></div>
+    <div id="dashboard-content" hidden>
+      <div class="stat-grid"><article class="stat-card"><span data-icon="wallet"></span><p class="stat-label" data-i18n="dashboard.credits">Kredi bakiyesi</p><p class="stat-value" id="stat-credits">0</p></article><article class="stat-card"><span data-icon="message"></span><p class="stat-label" data-i18n="dashboard.clicks">WhatsApp tıklamaları</p><p class="stat-value" id="stat-clicks">0</p></article><article class="stat-card"><span data-icon="list"></span><p class="stat-label" data-i18n="dashboard.openRequests">Açık iş talepleri</p><p class="stat-value" id="stat-requests">0</p></article></div>
+      <div class="dashboard-tabs" role="tablist" data-i18n-aria-label="nav.dashboard" aria-label="Usta Paneli"><button class="dashboard-tab" type="button" role="tab" id="tab-requests" aria-controls="panel-requests" aria-selected="true" data-tab="requests" data-i18n="dashboard.requestsTab">Uygun talepler</button><button class="dashboard-tab" type="button" role="tab" id="tab-unlocked" aria-controls="panel-unlocked" aria-selected="false" tabindex="-1" data-tab="unlocked" data-i18n="dashboard.unlockedTab">Açtığım talepler</button><button class="dashboard-tab" type="button" role="tab" id="tab-profile" aria-controls="panel-profile" aria-selected="false" tabindex="-1" data-tab="profile" data-i18n="dashboard.profile">Profilim</button><button class="dashboard-tab" type="button" role="tab" id="tab-admin" aria-controls="panel-admin" aria-selected="false" tabindex="-1" data-tab="admin" data-admin-only hidden data-i18n="dashboard.adminTab">Yönetim</button></div>
+      <section id="panel-requests" role="tabpanel" aria-labelledby="tab-requests" tabindex="0"><div class="lead-list" id="matching-requests"></div></section>
+      <section id="panel-unlocked" role="tabpanel" aria-labelledby="tab-unlocked" tabindex="0" hidden><div class="lead-list" id="unlocked-requests"></div></section>
+      <section class="panel profile-panel" id="panel-profile" role="tabpanel" aria-labelledby="tab-profile" tabindex="0" hidden><h2 data-i18n="dashboard.profile">Profilim</h2><form id="profile-form" class="stack" novalidate><div class="form-grid"><div class="field"><label for="profile-name" data-i18n="common.fullName">Ad soyad</label><input id="profile-name" name="fullName" autocomplete="name" minlength="2" maxlength="80" required></div><div class="field"><label for="profile-phone" data-i18n="common.phone">Telefon</label><input id="profile-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="24" placeholder="0533 8XX XX XX" required></div><div class="field"><label for="profile-city" data-i18n="common.city">İlçe</label><select id="profile-city" name="city" data-cities required></select></div><fieldset class="field-span" data-pro-profile><legend data-i18n="auth.proCategories">Verdiğiniz hizmetler</legend><div class="category-checks" id="profile-categories"></div></fieldset><div class="field field-span"><label for="profile-bio" data-i18n="auth.bio">Kendinizi ve yaptığınız işi anlatın</label><textarea id="profile-bio" name="bio" maxlength="1000" data-i18n-placeholder="auth.bioPlaceholder"></textarea></div></div><p class="help-text" data-pro-profile data-i18n="dashboard.publicProfile"></p><div id="profile-message" class="message" hidden></div><div><button class="btn btn-primary" id="profile-save" type="submit" data-i18n="common.save">Kaydet</button></div></form></section>
+      <section id="panel-admin" role="tabpanel" aria-labelledby="tab-admin" tabindex="0" hidden><div class="section-heading"><h2 data-i18n="dashboard.managePros">Usta hesapları</h2><button class="btn btn-secondary" id="admin-refresh" type="button" data-i18n="common.retry">Tekrar dene</button></div><div id="admin-message" class="message" hidden></div><div class="table-wrap"><table class="admin-table"><caption class="sr-only" data-i18n="dashboard.managePros">Usta hesapları</caption><thead><tr><th scope="col" data-i18n="common.fullName">Ad soyad</th><th scope="col" data-i18n="dashboard.credits">Kredi bakiyesi</th><th scope="col" data-i18n="dashboard.creditAmount">Eklenecek kredi</th><th scope="col" data-i18n="dashboard.featured">VIP vitrin</th></tr></thead><tbody id="admin-pros"></tbody></table></div><h2 class="moderation-title" data-i18n="dashboard.reviewModeration">Yorum onayı</h2><div id="admin-reviews" class="lead-list"></div></section>
+    </div>
+  </div></main>
+  <dialog class="modal" id="unlock-dialog" aria-labelledby="unlock-title"><div class="modal-header"><h2 id="unlock-title" data-i18n="dashboard.unlock">1 Kredi Kullan ve Numarayı Gör</h2><button class="btn btn-secondary btn-icon" type="button" data-close-dialog data-i18n-aria-label="common.close" aria-label="Kapat"><span data-icon="close"></span></button></div><div class="modal-body"><p data-i18n="dashboard.confirmUnlock"></p><div id="unlock-message" class="message" hidden></div></div><div class="modal-footer"><button class="btn btn-secondary" type="button" data-close-dialog data-i18n="common.cancel">Vazgeç</button><button class="btn btn-primary" type="button" id="confirm-unlock" data-i18n="dashboard.unlock">1 Kredi Kullan ve Numarayı Gör</button></div></dialog>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-copy"><a class="brand" href="/">HALLET</a><p data-i18n="footer.text">KKTC genelinde hizmet ve usta rehberi.</p><p class="footer-copyright" data-i18n="footer.copyright"></p></div>
+      <nav class="footer-nav" data-i18n-aria-label="a11y.footer" aria-label="Alt menü"><a href="/#ustalar" data-i18n="nav.pros">Usta bul</a><a href="/dashboard" data-i18n="nav.dashboard">Usta Paneli</a><button class="text-button footer-privacy" type="button" id="privacy-button" data-i18n="privacy.title">Veri kullanımı</button></nav>
+    </div>
+  </footer>
+  <dialog class="modal" id="privacy-dialog" aria-labelledby="privacy-title"><div class="modal-header"><h2 id="privacy-title" data-i18n="privacy.title">Veri kullanımı</h2><button type="button" class="btn btn-secondary btn-icon" data-close-dialog data-i18n-aria-label="common.close" aria-label="Kapat"><span data-icon="close"></span></button></div><div class="modal-body stack"><p data-i18n="privacy.body"></p><p data-i18n="privacy.contact"></p><p class="help-text" data-i18n="privacy.storage"></p></div></dialog>
+  <dialog class="modal auth-modal" id="auth-dialog" aria-labelledby="auth-title">
+    <div class="modal-header"><h2 id="auth-title">HALLET'e giriş yap</h2><button class="btn btn-secondary btn-icon" type="button" data-close-dialog data-i18n-aria-label="common.close" aria-label="Kapat"><span data-icon="close"></span></button></div>
+    <div class="modal-body">
+      <div class="row auth-modes" role="group" data-i18n-aria-label="auth.accountActions" aria-label="Hesap işlemleri"><button type="button" class="btn btn-secondary" data-auth-mode="login" aria-pressed="true" data-i18n="nav.login">Giriş yap</button><button type="button" class="btn btn-secondary" data-auth-mode="register" aria-pressed="false" data-i18n="auth.create">Hesap oluştur</button></div>
+      <div id="auth-message" class="message" hidden></div>
+      <form id="auth-form" class="stack auth-form" novalidate>
+        <div id="registration-fields" class="stack" hidden>
+          <div class="field"><label for="auth-role" data-i18n="auth.accountType">Hesap türü</label><select id="auth-role" name="role"><option value="customer" data-i18n="auth.customer">Hizmet almak istiyorum</option><option value="pro" data-i18n="auth.pro">Usta olarak çalışıyorum</option></select></div>
+          <div class="field"><label for="auth-name" data-i18n="common.fullName">Ad soyad</label><input id="auth-name" name="fullName" autocomplete="name" minlength="2" maxlength="80"></div>
+          <div class="field"><label for="auth-phone" data-i18n="common.phone">Telefon</label><input type="tel" id="auth-phone" name="phone" autocomplete="tel" inputmode="tel" maxlength="24" placeholder="0533 8XX XX XX"></div>
+          <div id="pro-registration-fields" class="stack" hidden>
+            <div class="field"><label for="auth-city" data-i18n="common.city">İlçe</label><select id="auth-city" name="city" data-cities></select></div>
+            <fieldset><legend data-i18n="auth.proCategories">Verdiğiniz hizmetler</legend><div id="auth-categories" class="category-checks"></div></fieldset>
+            <div class="field"><label for="auth-bio" data-i18n="auth.bio">Kendinizi ve yaptığınız işi anlatın</label><textarea id="auth-bio" name="bio" maxlength="1000" data-i18n-placeholder="auth.bioPlaceholder"></textarea></div>
+            <p class="help-text" data-i18n="auth.welcomeCredit">Yeni usta hesabınıza 3 başlangıç kredisi tanımlanır.</p>
+          </div>
+        </div>
+        <div class="field"><label for="auth-email" data-i18n="common.email">E-posta</label><input type="email" id="auth-email" name="email" autocomplete="email" maxlength="254" required></div>
+        <div class="field"><label for="auth-password" data-i18n="common.password">Şifre</label><input type="password" id="auth-password" name="password" autocomplete="current-password" maxlength="128" required><p class="help-text" data-i18n="auth.passwordHint">En az 8 karakter kullanın.</p></div>
+        <button class="btn btn-primary full-width" id="auth-submit" type="submit" data-i18n="nav.login">Giriş yap</button>
+      </form>
+      <div class="auth-divider" data-i18n="auth.separator">veya e-posta ile</div>
+      <button class="btn btn-secondary full-width" id="auth-google" type="button" data-i18n="auth.google">Google ile devam et</button>
+      <button class="text-button auth-reset" type="button" id="forgot-password" data-i18n="auth.forgotPassword">Şifremi unuttum</button>
+    </div>
+  </dialog>
+  
+  <noscript><div class="container message">HALLET için JavaScript açık olmalıdır. JavaScript is required. Для работы HALLET нужен JavaScript.</div></noscript>
+</body>
+</html>

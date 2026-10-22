@@ -1,0 +1,14 @@
+.git/
+node_modules/
+tests/
+scripts/
+test-results/
+playwright-report/
+.firebase/
+firestore.rules
+firestore.indexes.json
+firebase.json
+README.md
+package-lock.json
+*.log
+.env*
