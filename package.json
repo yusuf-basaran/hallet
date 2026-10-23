@@ -8,7 +8,10 @@
     "check": "node tests/check.mjs",
     "test:rules": "firebase emulators:exec --project demo-hallet --only firestore \"node --test --test-concurrency=1 tests/firestore.test.mjs\"",
     "test:browser": "firebase emulators:exec --project demo-hallet --only auth,firestore \"node tests/browser.mjs\"",
-    "test": "npm run check && npm run test:rules"
+    "test": "npm run check && npm run test:config && npm run test:rules",
+    "firebase:login": "firebase login --no-localhost",
+    "firebase:connect": "node scripts/firebase.mjs",
+    "test:config": "node --test tests/firebase-config.test.mjs"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "4.0.1",

@@ -32,6 +32,26 @@ npx firebase-tools deploy --only firestore --project FIREBASE_PROJECT_ID
 
 İlk admin hesabı için uygulamada normal bir hesap oluşturun. Firebase Console'da bu UID'ye ait `users` belgesinin yalnızca `role` alanını `admin` yapın. Web istemcisi kendine admin rolü veremez; mevcut hesaplar istemciden rol değiştiremez. Yeni usta hesabı oluşturulurken 3 kredi verilir; giriş veya sayfa yenileme tekrar kredi eklemez.
 
+## Otomatik Firebase bağlantısı
+
+Yetkili Firebase hesabının bulunduğu bilgisayarda şu komutlar Web yapılandırmasını alır ve proje seçimini yazar:
+
+```bash
+npm ci
+npm run firebase:login
+npm run firebase:connect -- --project FIREBASE_PROJECT_ID --deploy
+```
+
+Birden fazla Web uygulaması varsa `--app WEB_APP_ID` ekleyin. Komut, `js/firebase-config.js` ile `.firebaserc` dosyalarını günceller; `--deploy` seçeneği mevcut Native Firestore veritabanını kontrol edip kuralları ve indeksleri yayımlar. Veritabanı veya Web uygulaması yoksa bunu bildirir; yeni proje oluşturmaz. Google ve e-posta giriş sağlayıcıları Firebase Console'da etkin olmalıdır.
+
+Firebase Console'dan alınan Web yapılandırması JSON dosyası olarak mevcutsa hesap oturumu olmadan da istemci dosyaları hazırlanabilir:
+
+```bash
+npm run firebase:connect -- --config /dosya/yolu/firebase-web.json
+```
+
+Bu ikinci komut servisleri veya kuralları yayımlamaz. Yanlış proje kimliği, emülatör projesi ve servis hesabı özel anahtarı içeren dosyalar reddedilir. Doğrulama için `npm run test:config` kullanılır.
+
 ## Akışlar
 
 - Rehber: ilçe/kategori filtreleri, süresi devam eden VIP profillerin önceliği, kimlik onayı, onaylı yorumlar ve WhatsApp görüşmesi.
