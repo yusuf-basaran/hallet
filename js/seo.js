@@ -1,6 +1,6 @@
 export const LANGUAGE_PATHS = Object.freeze({ tr: "/", en: "/en", ru: "/ru" });
 export const LANGUAGE_LOCALES = Object.freeze({ tr: "tr_TR", en: "en_GB", ru: "ru_RU" });
-export const SOCIAL_IMAGE = "/assets/brand/hallet-social.png";
+export const SOCIAL_IMAGE = "/assets/brand/hallet-share.png";
 
 export function createStructuredData(origin, language, translations) {
   const pageUrl = new URL(LANGUAGE_PATHS[language], origin).href;
@@ -11,7 +11,7 @@ export function createStructuredData(origin, language, translations) {
     "@graph": [
       {
         "@type": "Organization", "@id": organizationId, name: "HALLET", url: `${origin}/`,
-        logo: { "@type": "ImageObject", url: `${origin}/assets/brand/app-icon-512.png`, width: 512, height: 512 },
+        logo: { "@type": "ImageObject", url: `${origin}/assets/brand/hallet-icon-512.png`, width: 512, height: 512 },
         areaServed: ["Lefkoşa", "Gazimağusa", "Girne", "İskele", "Güzelyurt", "Lefke"].map(name => ({ "@type": "AdministrativeArea", name }))
       },
       {

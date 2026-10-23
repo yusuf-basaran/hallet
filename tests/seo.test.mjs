@@ -48,7 +48,7 @@ test('Üç dil JavaScript gerektirmeden tutarlı başlık, içerik, canonical, s
       assert.equal(decode(meta(html, 'og:title')), dictionary[code].brand.title);
       assert.equal(decode(meta(html, 'twitter:description')), dictionary[code].brand.description);
       assert.equal(meta(html, 'twitter:card'), 'summary_large_image');
-      assert.equal(meta(html, 'og:image'), 'https://market.example/assets/brand/hallet-social.png');
+      assert.equal(meta(html, 'og:image'), 'https://market.example/assets/brand/hallet-share.png');
       assert.equal(meta(html, 'og:image:width'), '1200');
       assert.equal(meta(html, 'og:image:height'), '630');
       assert.ok(meta(html, 'robots').startsWith('index, follow'));
@@ -62,7 +62,7 @@ test('Üç dil JavaScript gerektirmeden tutarlı başlık, içerik, canonical, s
       assert.ok(html.includes(`href="${path}#ustalar"`));
       assert.ok(!html.includes('data-i18n-placeholder="wizard.detailPlaceholder"></textarea>'));
     }
-    const image = await readFile(join(root, 'dist/assets/brand/hallet-social.png'));
+    const image = await readFile(join(root, 'dist/assets/brand/hallet-share.png'));
     assert.equal(image.readUInt32BE(16), 1200);
     assert.equal(image.readUInt32BE(20), 630);
   });

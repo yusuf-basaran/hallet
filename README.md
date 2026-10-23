@@ -130,3 +130,7 @@ npm run test:seo
 ```
 
 Google Search Console ve Bing Webmaster sahiplik doğrulamaları hesap sahibine bağlıdır; doğrulama kodları veya takip kimlikleri uydurulmaz. Yayın sonrası Search Console’da siteyi doğrulayıp `sitemap.xml` gönderin. Arama motorlarının taraması ve sıralama zamanlaması harici hizmetlerin kararına bağlıdır.
+
+## Marka görselleri
+
+Üst ve alt bölümde son gönderilen yatay logonun şeffaf PNG sürümü (`hallet-wordmark.png`) kullanılır. Yüklenen JPEG aslı `hallet-wordmark-source.jpg` dosyasında korunur. Şeffaf beyaz H ve amber onay işaretini içeren kullanıcı dosyası `hallet-symbol-source.png` olarak saklanır; favicon ve uygulama simgelerinde aynı simge teal yüzey üzerinde gösterilir. 16, 32, 180, 192 ve 512 piksel dışa aktarımlar, manifest ve sosyal paylaşım kartı günceldir. Yeni dosya adları eski önbellekteki simgelerle karışmayı önler.
