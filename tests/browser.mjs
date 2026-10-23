@@ -11,10 +11,10 @@ const server = createServer(async (request, response) => {
   let path = new URL(request.url, 'http://localhost').pathname;
   if (path === '/') path = '/index.html';
   if (path === '/dashboard') path = '/dashboard.html';
-  if (!/^\/(index\.html|dashboard\.html|favicon\.svg|(?:js|css)\/[\w.-]+)$/.test(path)) { response.writeHead(404); response.end(); return; }
+  if (!/^\/(index\.html|dashboard\.html|favicon\.svg|site\.webmanifest|assets\/brand\/[\w.-]+\.(?:svg|png|jpg)|(?:js|css)\/[\w.-]+)$/.test(path)) { response.writeHead(404); response.end(); return; }
   try {
     const content = await readFile(join(root, path));
-    response.setHeader('Content-Type', { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.svg': 'image/svg+xml' }[extname(path)]);
+    response.setHeader('Content-Type', { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webmanifest': 'application/manifest+json' }[extname(path)]);
     response.end(content);
   } catch { response.writeHead(404); response.end(); }
 });

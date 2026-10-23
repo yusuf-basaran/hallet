@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 const root = new URL('../', import.meta.url).pathname;
 const port = Number(process.env.PORT || 3000);
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webmanifest': 'application/manifest+json' };
 createServer(async (request, response) => {
   let path = new URL(request.url, 'http://localhost').pathname;
   if (['/index', '/index.html', '/dashboard.html'].includes(path)) {
@@ -13,7 +13,7 @@ createServer(async (request, response) => {
   }
   if (path === '/') path = '/index.html';
   if (path === '/dashboard') path = '/dashboard.html';
-  if (!/^\/(index\.html|dashboard\.html|favicon\.svg|(?:js|css)\/[\w.-]+)$/.test(path)) {
+  if (!/^\/(index\.html|dashboard\.html|favicon\.svg|site\.webmanifest|assets\/brand\/[\w.-]+\.(?:svg|png|jpg)|(?:js|css)\/[\w.-]+)$/.test(path)) {
     response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     response.end('Sayfa bulunamadı.');
     return;

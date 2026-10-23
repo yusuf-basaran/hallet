@@ -7,6 +7,11 @@
   <title data-i18n="dashboard.title">HALLET — KKTC Hizmet ve Usta Pazaryeri</title>
   <meta name="description" content="HALLET usta ve admin paneli." data-i18n-content="brand.description">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/assets/brand/favicon-16.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png" sizes="180x180">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="HALLET">
   <link rel="stylesheet" href="/css/style.css">
   <script type="module" src="/js/dashboard.js"></script>
 </head>
@@ -14,10 +19,7 @@
   <a class="skip-link" href="#main" data-i18n="a11y.skip">İçeriğe geç</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="/" aria-label="HALLET">
-        <svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v24M26 4v24M6 16l7 7L26 10"/></svg>
-        <span>HALLET</span>
-      </a>
+      <a class="brand" href="/" aria-label="HALLET"><img class="brand-logo" src="/assets/brand/hallet-logo.svg" alt="HALLET" width="772" height="234" decoding="async"></a>
       <nav class="site-nav" id="site-nav" aria-label="Ana menü" data-i18n-aria-label="a11y.navigation">
         <a href="/#ustalar" data-i18n="nav.pros">Usta bul</a>
         <a href="/#nasil-calisir" data-i18n="nav.how">Nasıl çalışır?</a>
@@ -51,7 +53,7 @@
   <dialog class="modal" id="unlock-dialog" aria-labelledby="unlock-title"><div class="modal-header"><h2 id="unlock-title" data-i18n="dashboard.unlock">1 Kredi Kullan ve Numarayı Gör</h2><button class="btn btn-secondary btn-icon" type="button" data-close-dialog data-i18n-aria-label="common.close" aria-label="Kapat"><span data-icon="close"></span></button></div><div class="modal-body"><p data-i18n="dashboard.confirmUnlock"></p><div id="unlock-message" class="message" hidden></div></div><div class="modal-footer"><button class="btn btn-secondary" type="button" data-close-dialog data-i18n="common.cancel">Vazgeç</button><button class="btn btn-primary" type="button" id="confirm-unlock" data-i18n="dashboard.unlock">1 Kredi Kullan ve Numarayı Gör</button></div></dialog>
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-copy"><a class="brand" href="/">HALLET</a><p data-i18n="footer.text">KKTC genelinde hizmet ve usta rehberi.</p><p class="footer-copyright" data-i18n="footer.copyright"></p></div>
+      <div class="footer-copy"><a class="brand" href="/" aria-label="HALLET"><img class="brand-logo" src="/assets/brand/hallet-logo.svg" alt="HALLET" width="772" height="234" decoding="async"></a><p data-i18n="footer.text">KKTC genelinde hizmet ve usta rehberi.</p><p class="footer-copyright" data-i18n="footer.copyright"></p></div>
       <nav class="footer-nav" data-i18n-aria-label="a11y.footer" aria-label="Alt menü"><a href="/#ustalar" data-i18n="nav.pros">Usta bul</a><a href="/dashboard" data-i18n="nav.dashboard">Usta Paneli</a><button class="text-button footer-privacy" type="button" id="privacy-button" data-i18n="privacy.title">Veri kullanımı</button></nav>
     </div>
   </footer>

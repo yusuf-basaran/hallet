@@ -13,3 +13,4 @@ package-lock.json
 *.log
 .env*
 .firebaserc
+generated_images/
