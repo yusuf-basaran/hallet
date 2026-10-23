@@ -75,7 +75,7 @@ export async function buildSite({ root = process.cwd(), env = process.env, outpu
   const source = await readFile(join(root, 'index.html'), 'utf8');
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
-  for (const path of ['js', 'css', 'assets', 'favicon.svg', 'site.webmanifest', '404.html']) {
+  for (const path of ['js', 'css', 'assets', 'favicon.svg', 'site.webmanifest', '404.html', 'google674aad00b94cd44d.html']) {
     await cp(join(root, path), join(directory, path), { recursive: true });
   }
   const dashboard = await readFile(join(root, 'dashboard.html'), 'utf8');

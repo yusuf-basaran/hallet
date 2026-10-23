@@ -16,7 +16,7 @@ createServer(async (request, response) => {
   if (path === '/') path = '/index.html';
   if (path === '/dashboard') path = '/dashboard.html';
   if (['/en', '/ru'].includes(path)) path += '.html';
-  if (!/^\/(index\.html|dashboard\.html|en\.html|ru\.html|404\.html|robots\.txt|sitemap\.xml|favicon\.svg|site\.webmanifest|assets\/brand\/[\w.-]+\.(?:svg|png|jpg)|(?:js|css)\/[\w.-]+)$/.test(path)) {
+  if (!/^\/(index\.html|dashboard\.html|en\.html|ru\.html|404\.html|google674aad00b94cd44d\.html|robots\.txt|sitemap\.xml|favicon\.svg|site\.webmanifest|assets\/brand\/[\w.-]+\.(?:svg|png|jpg)|(?:js|css)\/[\w.-]+)$/.test(path)) {
     response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', 'X-Robots-Tag': 'noindex, follow' });
     response.end(await readFile(join(root, '404.html')));
     return;

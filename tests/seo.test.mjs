@@ -9,7 +9,7 @@ import { dictionary } from '../js/i18n.js';
 async function fixture(run) {
   const root = await mkdtemp(join(tmpdir(), 'hallet-seo-'));
   try {
-    for (const file of ['index.html', 'dashboard.html', '404.html', 'js', 'css', 'assets', 'favicon.svg', 'site.webmanifest']) {
+    for (const file of ['index.html', 'dashboard.html', '404.html', 'js', 'css', 'assets', 'favicon.svg', 'site.webmanifest', 'google674aad00b94cd44d.html']) {
       await cp(file, join(root, file), { recursive: true });
     }
     await run(root);

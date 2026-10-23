@@ -121,7 +121,7 @@ SITE_ORIGIN=http://127.0.0.1:3000 npm run build
 
 `/robots.txt` taramaya izin verir ve mutlak sitemap adresini bildirir. `/sitemap.xml` yalnızca üç herkese açık dil sayfasını ve dil eşleşmelerini içerir; panel, arama filtreleri ve hesap işlemleri listelenmez. Panel hem HTML meta etiketi hem `X-Robots-Tag` HTTP başlığı ile `noindex, nofollow, noarchive` alır. Panel robots.txt ile engellenmez; böylece arama motoru `noindex` talimatını okuyabilir. Erişim güvenliğini Firebase Authentication ve Firestore kuralları sağlar.
 
-Vercel Preview derlemeleri meta etiketlerinde `noindex, nofollow` içerir ve robots.txt tüm taramayı kapatır. Bilinmeyen yollar gerçek HTTP 404 ve `noindex` sayfasıyla yanıtlanır. `.html` ve sondaki eğik çizgi Vercel’in temiz URL ayarlarıyla kalıcı olarak normalleştirilir.
+Vercel Preview derlemeleri meta etiketlerinde `noindex, nofollow` içerir ve robots.txt tüm taramayı kapatır. Bilinmeyen yollar gerçek HTTP 404 ve `noindex` sayfasıyla yanıtlanır. Uygulama sayfalarının `.html` adresleri açık yönlendirmelerle, sondaki eğik çizgi ise Vercel ayarıyla kalıcı olarak normalleştirilir. Google sahiplik doğrulama HTML dosyası kökte yönlendirme olmadan sunulur.
 
 SEO kontrolleri:
 
@@ -134,3 +134,5 @@ Google Search Console ve Bing Webmaster sahiplik doğrulamaları hesap sahibine 
 ## Marka görselleri
 
 Üst ve alt bölümde son gönderilen yatay logonun şeffaf PNG sürümü (`hallet-wordmark.png`) kullanılır. Yüklenen JPEG aslı `hallet-wordmark-source.jpg` dosyasında korunur. Şeffaf beyaz H ve amber onay işaretini içeren kullanıcı dosyası `hallet-symbol-source.png` olarak saklanır; favicon ve uygulama simgelerinde aynı simge teal yüzey üzerinde gösterilir. 16, 32, 180, 192 ve 512 piksel dışa aktarımlar, manifest ve sosyal paylaşım kartı günceldir. Yeni dosya adları eski önbellekteki simgelerle karışmayı önler.
+
+Google Search Console için `google674aad00b94cd44d.html` dosyası içeriği değiştirilmeden yayın köküne kopyalanır. Doğrulama sonrası dosyayı silmeyin. Vercel’de genel `cleanUrls` dönüşümü yerine yalnızca uygulama sayfaları için yönlendirme ve rewrite kullanılır; doğrulama dosyasının tam `.html` adresi HTTP 200 döner.

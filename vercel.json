@@ -3,12 +3,32 @@
   "buildCommand": "node scripts/build.mjs",
   "installCommand": "node --version",
   "outputDirectory": "dist",
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": false,
   "redirects": [
     {
       "source": "/index",
       "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/en.html",
+      "destination": "/en",
+      "permanent": true
+    },
+    {
+      "source": "/ru.html",
+      "destination": "/ru",
       "permanent": true
     }
   ],
@@ -69,6 +89,29 @@
           "value": "noindex, follow"
         }
       ]
+    },
+    {
+      "source": "/google674aad00b94cd44d.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en.html"
+    },
+    {
+      "source": "/ru",
+      "destination": "/ru.html"
     }
   ]
 }
