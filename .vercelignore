@@ -1,7 +1,6 @@
 .git/
 node_modules/
 tests/
-scripts/
 test-results/
 playwright-report/
 .firebase/
@@ -14,3 +13,4 @@ package-lock.json
 .env*
 .firebaserc
 generated_images/
+dist/

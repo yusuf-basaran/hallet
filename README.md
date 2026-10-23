@@ -10,7 +10,7 @@ Node.js 22 ve üzeriyle:
 npm run dev
 ```
 
-Uygulama `http://127.0.0.1:3000` adresinde açılır. `/dashboard` temiz URL'si geliştirme sunucusunda da çalışır. Ön yüz için bağımlılık kurulumu veya derleme gerekmez. Firebase SDK dosyaları CDN'den yüklenir; internet bağlantısı gerekir.
+Uygulama `http://127.0.0.1:3000` adresinde açılır. `/dashboard` temiz URL'si geliştirme sunucusunda da çalışır. Geliştirme sunucusu yayın dosyalarını yerel adresle `dist/` altında üretir. Derleme için harici paket gerekmez. Firebase SDK dosyaları CDN'den yüklenir; internet bağlantısı gerekir.
 
 Firebase yapılandırması boşken açıkça etiketlenmiş altı örnek profil gösterilir. Bu profillerin iletişim düğmeleri kapalıdır; veritabanına örnek kayıt yazılmaz. Bağlantı kurulunca yalnızca gerçek usta profilleri gösterilir.
 
@@ -85,7 +85,7 @@ Bu Security Rules sürümü; rol yükseltmeyi, yetkisiz telefon erişimini ve at
 
 ## Vercel
 
-Depoyu Vercel'e içe aktarın. `vercel.json`, projeyi derlemesiz statik site olarak tanımlar; `/` ve `/dashboard` adreslerini destekler. Test araçlarının üretim için kurulmasına gerek yoktur. `.vercelignore` test dosyalarını ve Firebase dağıtım dosyalarını web çıktısının dışında bırakır.
+Depoyu Vercel'e içe aktarın. `vercel.json`, bağımlılık gerektirmeyen Node.js derlemesini çalıştırır ve yalnızca `dist/` klasörünü yayınlar; `/`, `/en`, `/ru` ve `/dashboard` adreslerini destekler. Test araçlarının üretim için kurulmasına gerek yoktur. Testler, dağıtım betikleri ve Firebase kural dosyaları web çıktısına kopyalanmaz.
 
 Uygulamanın kendi alan adı kodda sabit değildir. Sayfa bağlantıları kökten göreli, WhatsApp referansı mevcut alan adından türetilmiştir. Firebase ve WhatsApp gibi dış servislerin SDK/servis adresleri bu kuraldan bağımsızdır. Alan değişikliğinde Firebase Authorized domains ayarı yine güncellenmelidir.
 
@@ -104,3 +104,29 @@ npm run test:browser
 - Tarayıcı: 320, 390, 768 ve 1440 pikselde taşma kontrolü; filtreler; kalıcı dil tercihi; dört adımlı form; e-posta kaydı; müşteri talebi; krediyle gerçek numara açma; WhatsApp bağlantısının dinamik kaynağı; sayaç; admin kredi/VIP/onay işlemleri; yorum moderasyonu.
 
 Testler `demo-hallet` adlı yerel emülatör projesi kullanır. Tarayıcı testleri, dosyada canlı proje bilgileri olsa da her istekte yapılandırmayı boş örnek görünüm veya yerel emülatör projesiyle değiştirir. Canlı Auth, Firestore ve token API uç noktaları test tarayıcısında engellenir; üretim yapılandırması değiştirilmez. Google düğmesi Modular SDK ile bağlıdır; gerçek Google OAuth ve canlı Firebase/Vercel ayarları yerel emülatör testinin kapsamında değildir.
+
+## SEO ve çok dilli yayın
+
+Vercel `node scripts/build.mjs` komutuyla yalnızca yayın dosyalarını `dist/` altında üretir. Türkçe `/`, İngilizce `/en` ve Rusça `/ru` sayfalarının başlıkları, açıklamaları ve görünür metinleri HTML içinde hazırdır; arama motorları ve paylaşım botları JavaScript çalıştırmadan okuyabilir. Dil değiştirme düğmeleri gerçek bağlantılardır; uygulama içinde form durumunu koruyarak adresi ve meta bilgilerini günceller. Paylaşılan dil adresi tarayıcıda kayıtlı dil tercihinden önce gelir.
+
+Her dil için kendine işaret eden canonical, karşılıklı `hreflang` bağlantıları ve `x-default`, Open Graph ve X/Twitter kartları bulunur. Marka logosuyla hazırlanmış paylaşım görseli 1200×630 PNG’dir. JSON-LD verisi Organization, WebSite ve WebPage tanımlarını içerir. Adres, değerlendirme, hizmet bedeli veya sosyal hesap uydurulmaz.
+
+Yayın adresi sırasıyla `SITE_ORIGIN`, `VERCEL_PROJECT_PRODUCTION_URL` ve `VERCEL_URL` değişkenlerinden alınır. Uygulama domaini kaynak kodda bulunmaz. Vercel sistem değişkenleri açık olduğunda mevcut yayın adresi otomatik kullanılır. Özel domaine geçerken Vercel’de `SITE_ORIGIN` değerini `https://` ile başlayan yeni ana adres olarak ayarlayıp yeniden yayınlayın; canonical, sosyal kart adresleri ve sitemap birlikte güncellenir. Eski adresin yeni domaine kalıcı yönlendirilmesi Vercel domain ayarlarından yapılır. Firebase Authorized domains listesine yeni alan adı ayrıca eklenir.
+
+Yerel yayın dosyalarını üretmek için:
+
+```bash
+SITE_ORIGIN=http://127.0.0.1:3000 npm run build
+```
+
+`/robots.txt` taramaya izin verir ve mutlak sitemap adresini bildirir. `/sitemap.xml` yalnızca üç herkese açık dil sayfasını ve dil eşleşmelerini içerir; panel, arama filtreleri ve hesap işlemleri listelenmez. Panel hem HTML meta etiketi hem `X-Robots-Tag` HTTP başlığı ile `noindex, nofollow, noarchive` alır. Panel robots.txt ile engellenmez; böylece arama motoru `noindex` talimatını okuyabilir. Erişim güvenliğini Firebase Authentication ve Firestore kuralları sağlar.
+
+Vercel Preview derlemeleri meta etiketlerinde `noindex, nofollow` içerir ve robots.txt tüm taramayı kapatır. Bilinmeyen yollar gerçek HTTP 404 ve `noindex` sayfasıyla yanıtlanır. `.html` ve sondaki eğik çizgi Vercel’in temiz URL ayarlarıyla kalıcı olarak normalleştirilir.
+
+SEO kontrolleri:
+
+```bash
+npm run test:seo
+```
+
+Google Search Console ve Bing Webmaster sahiplik doğrulamaları hesap sahibine bağlıdır; doğrulama kodları veya takip kimlikleri uydurulmaz. Yayın sonrası Search Console’da siteyi doğrulayıp `sitemap.xml` gönderin. Arama motorlarının taraması ve sıralama zamanlaması harici hizmetlerin kararına bağlıdır.

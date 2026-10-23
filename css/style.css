@@ -108,9 +108,9 @@ legend { margin-bottom: 12px; padding: 0; font-weight: 600; }
 .site-nav a { color: var(--color-surface); font-size: .875rem; }
 .site-header :focus-visible, .site-footer :focus-visible { outline-color: var(--color-accent); }
 .language-switch { display: inline-flex; gap: 2px; }
-.language-switch button { min-height: 36px; min-width: 36px; padding: 6px; border: 1px solid transparent; border-radius: var(--radius); background: transparent; color: var(--color-border); font-size: .75rem; font-weight: 600; }
-.language-switch button:hover, .language-switch button.is-active { border-color: var(--color-text-secondary); color: var(--color-surface); }
-.language-switch button.is-active { color: var(--color-accent); }
+.language-switch [data-language] { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; min-height: 36px; min-width: 36px; padding: 6px; border: 1px solid transparent; border-radius: var(--radius); background: transparent; color: var(--color-border); font-size: .75rem; font-weight: 600; }
+.language-switch [data-language]:hover, .language-switch [data-language].is-active { border-color: var(--color-text-secondary); color: var(--color-surface); }
+.language-switch [data-language].is-active { color: var(--color-accent); }
 
 .btn {
   display: inline-flex;

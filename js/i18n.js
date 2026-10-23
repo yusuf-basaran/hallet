@@ -1,3 +1,5 @@
+import { syncSeo } from "./seo.js";
+
 export const SUPPORTED_LANGUAGES = Object.freeze(["tr", "en", "ru"]);
 export const CITIES = Object.freeze([
   "Lefkoşa", "Gazimağusa", "Girne", "İskele", "Güzelyurt", "Lefke"
@@ -9,8 +11,8 @@ export const CATEGORY_IDS = Object.freeze([
 export const dictionary = {
   tr: {
     brand: {
-      title: "HALLET — KKTC Hizmet ve Usta Pazaryeri",
-      description: "KKTC'de ilçe ve hizmet türüne göre usta bulun, ustalarla WhatsApp üzerinden görüşün veya ücretsiz fiyat teklifi talebi bırakın."
+      title: "HALLET | KKTC Usta Bul ve Ücretsiz Fiyat Teklifi Al",
+      description: "KKTC’de klima, tesisat, temizlik, nakliye ve çilingir için usta bulun. Bölgenizdeki ustaları karşılaştırın, WhatsApp’tan yazın veya ücretsiz fiyat teklifi isteyin."
     },
     nav: {
       home: "Anasayfa", pros: "Usta bul", how: "Nasıl çalışır?",
@@ -128,8 +130,8 @@ export const dictionary = {
   },
   en: {
     brand: {
-      title: "HALLET — North Cyprus Services & Tradespeople",
-      description: "Find tradespeople by district and service across North Cyprus. Contact them on WhatsApp or post a free quote request."
+      title: "HALLET | Local Services & Tradespeople in North Cyprus",
+      description: "Find local tradespeople in North Cyprus for air conditioning, plumbing, cleaning, removals and locksmith services. Contact them on WhatsApp or request free quotes."
     },
     nav: {
       home: "Home", pros: "Find a professional", how: "How it works",
@@ -247,8 +249,8 @@ export const dictionary = {
   },
   ru: {
     brand: {
-      title: "HALLET — Услуги и мастера на Северном Кипре",
-      description: "Найдите мастера в своём районе на Северном Кипре. Напишите ему в WhatsApp или оставьте бесплатную заявку на расчёт стоимости."
+      title: "HALLET | Мастера и бытовые услуги на Северном Кипре",
+      description: "Мастера на Северном Кипре: кондиционеры, сантехника, уборка, переезды и вскрытие замков. Сравните специалистов, напишите в WhatsApp или запросите стоимость работ."
     },
     nav: {
       home: "Главная", pros: "Найти мастера", how: "Как это работает",
@@ -515,8 +517,14 @@ const boundRoots = new WeakSet();
 let currentLanguage = "tr";
 
 try {
-  const stored = window.localStorage.getItem(storageKey);
-  if (SUPPORTED_LANGUAGES.includes(stored)) currentLanguage = stored;
+  const path = window.location?.pathname;
+  if (path === "/" || path === "/index.html") currentLanguage = "tr";
+  else if (path === "/en" || path === "/en.html") currentLanguage = "en";
+  else if (path === "/ru" || path === "/ru.html") currentLanguage = "ru";
+  else {
+    const stored = window.localStorage.getItem(storageKey);
+    if (SUPPORTED_LANGUAGES.includes(stored)) currentLanguage = stored;
+  }
 } catch {
   currentLanguage = "tr";
 }
@@ -566,6 +574,7 @@ export function translatePage(root = document) {
 
   document.documentElement.lang = currentLanguage;
   document.documentElement.dir = "ltr";
+  syncSeo(currentLanguage, dictionary[currentLanguage]);
   for (const button of matchingElements(root, "[data-language]")) {
     const selected = button.dataset.language.toLowerCase() === currentLanguage;
     button.setAttribute("aria-pressed", String(selected));
@@ -598,7 +607,10 @@ export function initI18n(root = document) {
     root.addEventListener("click", event => {
       if (!(event.target instanceof Element)) return;
       const button = event.target.closest("[data-language]");
-      if (button) setLanguage(button.dataset.language);
+      if (button && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+        event.preventDefault();
+        setLanguage(button.dataset.language);
+      }
     });
     root.addEventListener("change", event => {
       if (event.target instanceof HTMLSelectElement && event.target.matches("[data-language-select]")) {

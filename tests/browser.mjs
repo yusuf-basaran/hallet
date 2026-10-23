@@ -9,7 +9,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 const root = process.cwd();
 const server = createServer(async (request, response) => {
   let path = new URL(request.url, 'http://localhost').pathname;
-  if (path === '/') path = '/index.html';
+  if (['/', '/en', '/ru'].includes(path)) path = '/index.html';
   if (path === '/dashboard') path = '/dashboard.html';
   if (!/^\/(index\.html|dashboard\.html|favicon\.svg|site\.webmanifest|assets\/brand\/[\w.-]+\.(?:svg|png|jpg)|(?:js|css)\/[\w.-]+)$/.test(path)) { response.writeHead(404); response.end(); return; }
   try {

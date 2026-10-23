@@ -10,3 +10,4 @@ playwright-report/
 !.env.example
 *.hallet-*.tmp
 generated_images/
+dist/
