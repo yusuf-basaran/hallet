@@ -24,18 +24,24 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 const errors = [];
 const contexts = [];
 let environment;
-async function context(live = false) {
+async function context(emulated = false) {
   const value = await browser.newContext({ ignoreHTTPSErrors: true });
   contexts.push(value);
   value.on('page', page => page.on('pageerror', error => errors.push(error.message)));
-  if (live) {
-    await value.route('**/js/firebase-config.js', async route => {
-      let code = await readFile('js/firebase-config.js', 'utf8');
-      code = code.replace('apiKey: ""', 'apiKey: "demo-api-key"').replace('authDomain: ""', 'authDomain: "localhost"').replace('projectId: ""', 'projectId: "demo-hallet"').replace('appId: ""', 'appId: "1:123:web:hallet"');
+  await value.route(/^https:\/\/(?:firestore|identitytoolkit|securetoken)\.googleapis\.com\//, route => route.abort());
+  await value.route('**/js/firebase-config.js', async route => {
+    let code = await readFile('js/firebase-config.js', 'utf8');
+    const config = emulated
+      ? { apiKey: 'demo-api-key', authDomain: 'localhost', projectId: 'demo-hallet', appId: '1:123:web:hallet' }
+      : { apiKey: '', authDomain: '', projectId: '', appId: '' };
+    const pattern = /export const firebaseConfig = Object\.freeze\(\{[^}]*\}\);/g;
+    assert.equal([...code.matchAll(pattern)].length, 1);
+    code = code.replace(pattern, () => `export const firebaseConfig = Object.freeze(${JSON.stringify(config)});`);
+    if (emulated) {
       code += '\nimport { connectAuthEmulator } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";\nimport { connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";\nconnectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });\nconnectFirestoreEmulator(db, "127.0.0.1", 8080);';
-      await route.fulfill({ contentType: 'text/javascript', body: code });
-    });
-  }
+    }
+    await route.fulfill({ contentType: 'text/javascript', body: code });
+  });
   return value;
 }
 async function visible(page, selector) { await page.locator(selector).first().waitFor({state:'visible'}); }

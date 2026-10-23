@@ -33,12 +33,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 export const firebaseConfig = Object.freeze({
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  "apiKey": "AIzaSyC-OYzG2Nb0Ac0L1b1SZL-s9SroB78XmUU",
+  "authDomain": "hallet-823c7.firebaseapp.com",
+  "projectId": "hallet-823c7",
+  "storageBucket": "hallet-823c7.firebasestorage.app",
+  "messagingSenderId": "287429204022",
+  "appId": "1:287429204022:web:2d290c1750780c1b75a097",
+  "measurementId": "G-1MC9LCHHJC"
 });
 
 export const isFirebaseConfigured = [

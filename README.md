@@ -16,6 +16,8 @@ Firebase yapılandırması boşken açıkça etiketlenmiş altı örnek profil g
 
 ## Firebase bağlantısı
 
+Bu depodaki Web yapılandırması ve `.firebaserc` hedefi `hallet-823c7` projesine bağlıdır. Authentication sağlayıcılarının etkinleştirilmesi, Firestore veritabanının oluşturulması ve kuralların yayımlanması ayrıca Firebase hesabı üzerinden yapılır.
+
 1. Firebase Console'da projenize bir Web uygulaması ekleyin. `js/firebase-config.js` içindeki `firebaseConfig` alanlarını Console'un verdiği Web yapılandırmasıyla doldurun. Servis hesabı anahtarı bu dosyaya konmaz.
 2. Authentication → Sign-in method altında Email/Password ve Google sağlayıcılarını etkinleştirin. Google için destek e-postasını belirtin.
 3. Authentication → Settings → Authorized domains listesine geliştirme sunucusunun alanını, Vercel adresini ve varsa özel alanı ekleyin. Protokol veya port eklemeyin. Domain değişince bu listeyi güncelleyin; uygulamadaki bağlantılar değişmez.
@@ -101,4 +103,4 @@ npm run test:browser
 - 16 Firestore testi: anonim/özel erişim, doğru sorgular, başlangıç kredisi, rol ve şema koruması, tek taraflı veya çoklu numara açma girişimleri, eşzamanlı kredi kullanımı, iletişim belgesi, admin işlemleri, yorum onayı ve sayaç alanı sınırları.
 - Tarayıcı: 320, 390, 768 ve 1440 pikselde taşma kontrolü; filtreler; kalıcı dil tercihi; dört adımlı form; e-posta kaydı; müşteri talebi; krediyle gerçek numara açma; WhatsApp bağlantısının dinamik kaynağı; sayaç; admin kredi/VIP/onay işlemleri; yorum moderasyonu.
 
-Testler `demo-hallet` adlı yerel emülatör projesi kullanır. Tarayıcı testinde demo bağlantısı yalnızca test isteğine eklenir; üretim yapılandırması değiştirilmez. Google düğmesi Modular SDK ile bağlıdır; gerçek Google OAuth ve canlı Firebase/Vercel ayarları yerel emülatör testinin kapsamında değildir.
+Testler `demo-hallet` adlı yerel emülatör projesi kullanır. Tarayıcı testleri, dosyada canlı proje bilgileri olsa da her istekte yapılandırmayı boş örnek görünüm veya yerel emülatör projesiyle değiştirir. Canlı Auth, Firestore ve token API uç noktaları test tarayıcısında engellenir; üretim yapılandırması değiştirilmez. Google düğmesi Modular SDK ile bağlıdır; gerçek Google OAuth ve canlı Firebase/Vercel ayarları yerel emülatör testinin kapsamında değildir.
