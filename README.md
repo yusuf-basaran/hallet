@@ -2,6 +2,26 @@
 
 KKTC için hizmet pazaryeri ve usta rehberi. Saf HTML, CSS ve ES modülleri; Firebase 10.14.1 Modular SDK; Vercel üzerinde statik barındırma.
 
+<!-- project-overview:start -->
+## Projeye genel bakış
+
+![HALLET proje özellikleri: Bölgesel usta rehberi, Dört adımlı talep, Krediyle iletişim erişimi, WhatsApp bağlantıları, Panel ve moderasyon, Üç dilde arayüz](docs/images/project-overview.png)
+
+[Görseli büyük aç](docs/images/project-overview.png) · [SVG kaynağı](docs/images/project-overview.svg)
+
+<details>
+<summary>Görseldeki özellikler ve ilgili kaynaklar</summary>
+
+- **[Bölgesel usta rehberi](js/app.js)** — İlçe ve kategori filtreleri; VIP profil önceliği.
+- **[Dört adımlı talep](index.html)** — İhtiyaç, zamanlama, bölge ve iletişim akışı.
+- **[Krediyle iletişim erişimi](js/lead-service.js)** — Müşteri numarasını kredi işlemiyle açma.
+- **[WhatsApp bağlantıları](js/shared.js)** — Usta profilinden hazır görüşme ekranı açma.
+- **[Panel ve moderasyon](js/dashboard.js)** — Kredi, VIP, kimlik onayı ve yorum yönetimi.
+- **[Üç dilde arayüz](js/i18n.js)** — Türkçe, İngilizce ve Rusça dil sayfaları.
+
+</details>
+<!-- project-overview:end -->
+
 ## Çalıştırma
 
 Node.js 22 ve üzeriyle:
